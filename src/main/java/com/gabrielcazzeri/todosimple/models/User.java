@@ -1,5 +1,7 @@
 package com.gabrielcazzeri.todosimple.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -28,8 +31,7 @@ public class User {
     public static final String TABLE_NAME = "user"; // define o nome da tabela gerada pela classe.
 
     @Id // Identifica que essa variável é um "ID"
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Identifica a estratégia de geração automática do tipo
-                                                        // "IDENTITY"
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Identifica a estratégia de geração automática do tipo "Identity"
     @Column(name = "id", unique = true) // Nome da coluna no banco de dados
     private Long id;
 
@@ -46,7 +48,8 @@ public class User {
     @Size(groups = { CreateUser.class, UpdateUser.class }, min = 8, max = 60)
     private String password;
 
-    // private List<Task> tasks = new ArrayList<Task>();
+    @OneToMany(mappedBy = "user")
+    private List<Task> tasks = new ArrayList<Task>();
 
     // @NoArgsConstructor (Lombok)
     public User() {
@@ -82,6 +85,15 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    public List<Task> getTasks() {
+        return this.tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     // HashCode & Equals
