@@ -63,6 +63,15 @@ public class Task {
         this.user = user;
     }
 
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
     // HashCode & Equals
     @Override
     public boolean equals(Object obj) {
