@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.gabrielcazzeri.todosimple.security.JWTAuthenticationFilter;
 import com.gabrielcazzeri.todosimple.security.JWTUtil;
 
 @Configuration
@@ -50,19 +51,20 @@ public class SecurityConfig {
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.authorizeHttpRequests(requests -> requests
-                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
-                .requestMatchers(PUBLIC_MATCHERS).permitAll()
-                .anyRequest().authenticated());
-
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(this.userDetailsService).passwordEncoder(bCryptPasswordEncoder());
         
         this.authenticationManager = authenticationManagerBuilder.build();
 
-        // http.authenticationManager(authenticationManager);
+        http.authorizeHttpRequests(requests -> requests
+                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                .anyRequest().authenticated().and().authenticationManager(authenticationManager));
+
+
+        http.addFilter(new JWTAuthenticationFilter(this.authenticationManager, this.jwtUtil));
+
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
